@@ -1,6 +1,24 @@
 import requests
 
 class TwitterAPI:
+
+    def get_field_string(fields:dict):
+        field_str = "?"
+        for i, field in enumerate(fields):
+            field_str += field + "="
+
+            field_value = fields[field]
+
+            if type(field_value) == str:
+                field_str += field_value
+            else:
+                field_str += ','.join(field_value)
+            
+            if i < len(fields)-1:
+                field_str += '&'
+        
+        return field_str
+
     def __init__(self, bearer_token:str) -> None:
         self.bearer_token = bearer_token
         self.auth_header = {"Authorization": f"Bearer {self.bearer_token}"}
