@@ -25,10 +25,6 @@ class TwitterAPI:
         self.bearer_token = bearer_token
         self.auth_header = {"Authorization": f"Bearer {self.bearer_token}"}
 
-    def get_tweet(self, tweet_id:int):
-        return requests.get(headers=self.auth_header,
-        url=f"https://api.twitter.com/labs/2/tweets/{tweet_id}?expansions=attachments.media_keys&tweet.fields=created_at,author_id,lang,source,public_metrics,context_annotations,entities")
-
     def get_user_tweets(self, user_id:int, extra_fields = {}):
         fields = {"tweet.fields": "public_metrics", "max_results": '100', "tweet.fields": "public_metrics"} | extra_fields
         return requests.get(headers=self.auth_header,
