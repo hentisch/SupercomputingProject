@@ -3,8 +3,10 @@ import requests
 class TwitterAPI:
 
     def get_field_string(fields:dict):
-        if len(list(fields)) > 0:
-            field_str = "?"
+        if len(list(fields)) == 0:
+            return ''
+        
+        field_str = "?"
         
         for i, field in enumerate(fields):
             field_str += field + "="
@@ -26,7 +28,7 @@ class TwitterAPI:
         self.auth_header = {"Authorization": f"Bearer {self.bearer_token}"}
 
     def get_user_tweets(self, user_id:int, extra_fields = {}):
-        fields = {"tweet.fields": "public_metrics", "max_results": '100', "tweet.fields": "public_metrics"} | extra_fields
+        fields = {"tweet.fields": "public_metrics", "max_results": '100'} | extra_fields
         return requests.get(headers=self.auth_header,
         url=f"https://api.twitter.com/2/users/{user_id}/tweets" + TwitterAPI.get_field_string(fields))
     
