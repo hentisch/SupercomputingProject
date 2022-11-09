@@ -3,6 +3,7 @@ import requests
 class TwitterAPI:
 
     api_link = "https://api.twitter.com/2/" 
+    tweet_fields = ["public_metrics", "conversation_id", "in_reply_to_user_id", "author_id"]
 
     def get_field_string(fields:dict):
         if len(list(fields)) == 0:
@@ -34,7 +35,7 @@ class TwitterAPI:
         self.auth_header = {"Authorization": f"Bearer {self.bearer_token}"}
 
     def get_user_tweets(self, user_id:int, extra_fields = {}):
-        fields = {"tweet.fields": ["public_metrics", "conversation_id", "in_reply_to_user_id", "author_id"], "max_results": '100'} | extra_fields
+        fields = {"tweet.fields": self.tweet_fields, "max_results": '100'} | extra_fields
         return requests.get(headers=self.auth_header,
         url=self.get_url(f"users/{user_id}/tweets", fields))
     
@@ -44,5 +45,6 @@ class TwitterAPI:
         return int(response.json()["data"]["id"])
 
     def get_tweet_responses(self, conversation_id:int, extra_fields = {}):
-        fields = {"query": f"conversation_id:{conversation_id}"}
-        return requests.get(headers=self.auth_header, url=self.get_url("/2/tweets/search/recent", fields))
+        fields = {"query": f"conversation_id:{conversation_id}", "tweet.fields": self.tweet_fields}
+        response = requests.get(headers=self.auth_header, url=self.get_url("tweets/search/recent", fields))
+        return response
