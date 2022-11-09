@@ -1,11 +1,17 @@
 import collections
 import twitter_api
 
-class TweetStream:
-    def __init__(self, api:twitter_api.TwitterAPI, user_id) -> None:
+class GetAuthorTweet:
+    def __init__(self, author_id:int, api:twitter_api.TwitterAPI) -> None:
+        self.author_id = author_id
         self.api = api
-        
-        self.user_id = user_id
+    
+    def get_tweets(self, fields:dict):
+        return self.api.get_user_tweets(self.author_id, extra_fields=fields)
+
+class TweetStream:
+    def __init__(self, tweet_get:object) -> None:
+        self.tweet_get = tweet_get
         self.posts = collections.deque()
         self.pagination_token = None
 
@@ -26,7 +32,7 @@ class TweetStream:
             else:
                 fields = {"pagination_token": self.pagination_token, "max_results": "5"}
             
-            api_response = self.api.get_user_tweets(self.user_id, extra_fields=fields)
+            api_response = self.tweet_get.get_tweets(fields)
             
             try:
                 posts = api_response.json()['data']
