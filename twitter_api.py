@@ -6,6 +6,19 @@ class TwitterAPI:
     tweet_fields = ["public_metrics", "conversation_id", "in_reply_to_user_id", "author_id"]
 
     def get_field_string(fields:dict):
+        """ A specially formatted string of fields to append to a Twitter API endpoint 
+        
+        Paramaters 
+        ----------
+        fields : dict
+            A dictonary representing each field to be formatted
+
+        Returns
+        -------
+        str
+            A formatted string of fields
+        """
+        
         if len(list(fields)) == 0:
             return ''
         
@@ -34,17 +47,60 @@ class TwitterAPI:
         self.bearer_token = bearer_token
         self.auth_header = {"Authorization": f"Bearer {self.bearer_token}"}
 
-    def get_user_tweets(self, user_id:int, extra_fields = {}):
+    def get_user_tweets(self, user_id:int, extra_fields = {}) -> requests.Response:
+        """ The tweet history of a particular user in the raw form returned by the Twitter API
+        
+        Paramaters
+        ----------
+        user_id : int
+            The user_id of the specified user
+        extra_fields : dict, optional
+            Any extra fields to be added to the URL of the reuqest. Fields in this will override the methods default fields.
+
+        Returns
+        -------
+        requests.Response
+            The raw response from the Twitter API
+        """
         fields = {"tweet.fields": self.tweet_fields, "max_results": '100'} | extra_fields
         return requests.get(headers=self.auth_header,
         url=self.get_url(f"users/{user_id}/tweets", fields))
     
-    def get_user_id(self, username:str, extra_fields = {}):
+    def get_user_id(self, username:str, extra_fields = {}) -> requests.Response:
+        """ The user id of the Twitter user with the specified username
+        
+        Paramaters
+        ----------
+        username : str
+            Twitter Username of the specified user
+        extra_fields : dict
+            Any extra fields to be added to the URL of the reuqest. Fields in this will override the methods default fields.
+
+        Returns
+        -------
+        requests.Response
+            The raw response from the Twitter API    
+        """
+            
         response = requests.get(headers=self.auth_header,
         url=self.get_url(f"users/by/username/{username}", extra_fields))
         return int(response.json()["data"]["id"])
 
     def get_tweet_responses(self, conversation_id:int, extra_fields = {}):
+        """ The responses of a particular tweet
+        
+        Paramaters 
+        ----------
+        conversation_id : int
+            The converation ID of the Tweet to retrive the responses of
+        extra_fields : dict
+            Any extra fields to tbe added to the URL of the request. Fields in this will override the methods default fields. 
+            
+        Returns
+        -------
+        requests.Response
+            The raw response from the Twitter API """
+    
         fields = {"query": f"conversation_id:{conversation_id}", "tweet.fields": self.tweet_fields}
         response = requests.get(headers=self.auth_header, url=self.get_url("tweets/search/recent", fields))
         return response
