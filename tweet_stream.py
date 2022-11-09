@@ -1,5 +1,7 @@
 import collections
+
 import twitter_api
+import tweet
 
 class GetAuthorTweet:
     def __init__(self, author_id:int, api:twitter_api.TwitterAPI) -> None:
@@ -20,9 +22,12 @@ class TweetStream:
     def __iter__(self):
         return self
 
+    def _get_tweet_object(self):
+        return tweet.Tweet.from_json(self.posts.popleft())
+
     def __next__(self):
         try:
-            return self.posts.popleft()
+            return self._get_tweet_object()
         except IndexError:
             if not self.more_pagination:
                 raise StopIteration
@@ -46,4 +51,4 @@ class TweetStream:
 
             self.posts.extend(posts)
 
-            return self.posts.popleft()
+            return self._get_tweet_object()
