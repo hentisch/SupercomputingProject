@@ -8,7 +8,12 @@ class GetAuthorTweet:
         self.author_id = author_id
         self.api = api
     
-    def get_tweets(self, fields:dict):
+    def get_tweets(self, pagination_token:str=None, other_fields:dict={}):
+        if pagination_token == None:
+            fields = other_fields
+        else:
+            fields = {"pagination_token": pagination_token} | other_fields
+        
         return self.api.get_user_tweets(self.author_id, extra_fields=fields)
 
     def get_stream(author_id:int, api:twitter_api.TwitterAPI) -> None:
@@ -19,7 +24,12 @@ class GetTweetResponses:
         self.conversation_id = conversation_id
         self.api = api
 
-    def get_responses(self, fields:dict):
+    def get_tweets(self, pagination_token:str=None, other_fields:dict = {}):
+        if pagination_token == None:
+            fields = other_fields
+        else:
+            fields = {"next_token": pagination_token} | other_fields
+        
         return self.api.get_tweet_responses(self.conversation_id, extra_fields=fields)
     
     def get_stream(conversation_id:int, api:twitter_api.TwitterAPI) -> None:
@@ -46,12 +56,7 @@ class TweetStream:
             if not self.more_pagination:
                 raise StopIteration
             
-            if self.pagination_token == None:
-                fields = {"max_results": "5"}
-            else:
-                fields = {"pagination_token": self.pagination_token, "max_results": "5"}
-            
-            api_response = self.tweet_get.get_tweets(fields)
+            api_response = self.tweet_get.get_tweets(pagination_token=self.pagination_token, other_fields={"max_results": "5"})
             
             try:
                 posts = api_response.json()['data']
