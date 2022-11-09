@@ -1,3 +1,6 @@
+import tweet_stream
+import twitter_api
+
 class TweetMetrics:
     def __init__(self, retweet_count:int, reply_count:int, like_count:int, quote_count:int)-> None:
         self.retweet_count = retweet_count
@@ -39,3 +42,7 @@ class Tweet:
         conversation_id=int(tweet_dict['conversation_id']),
         is_reply=is_reply,
         metrics=TweetMetrics.from_json(tweet_dict["public_metrics"]))
+    
+    def get_response_stream(self, api:twitter_api.TwitterAPI):
+        response_getter = tweet_stream.GetTweetResponses(self.conversation_id, api)
+        return tweet_stream.TweetStream(response_getter)
