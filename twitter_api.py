@@ -34,7 +34,7 @@ class TwitterAPI:
         self.auth_header = {"Authorization": f"Bearer {self.bearer_token}"}
 
     def get_user_tweets(self, user_id:int, extra_fields = {}):
-        fields = {"tweet.fields": ["public_metrics", "conversation_id", "in_reply_to_user_id"], "max_results": '100'} | extra_fields
+        fields = {"tweet.fields": ["public_metrics", "conversation_id", "in_reply_to_user_id", "author_id"], "max_results": '100'} | extra_fields
         return requests.get(headers=self.auth_header,
         url=self.get_url(f"users/{user_id}/tweets", fields))
     
