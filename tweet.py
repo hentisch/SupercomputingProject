@@ -5,10 +5,37 @@ class TweetMetrics:
         self.like_count = like_count
         self.quote_count = quote_count
 
+    def from_json(metrics:dict):
+        return TweetMetrics(
+            retweet_count=int(metrics["retweet_count"]),
+            reply_count=int(metrics["reply_count"]),
+            like_count=int(metrics["like_count"]),
+            quote_count=int(metrics["quote_count"])
+        )
+
 class Tweet:
-    def __init__(self, id:int, text:str, author_id:int, conversation_id:str, metrics:TweetMetrics) -> None:
+    def __init__(self, id:int, text:str, author_id:int, conversation_id:int, is_reply:bool, metrics:TweetMetrics) -> None:
         self.id = id
         self.text = text
         self.author_id = author_id
         self.conversation_id = conversation_id
+        self.is_reply = is_reply
         self.metrics = metrics
+    
+    def from_json(tweet:dict, constant_information:dict={}):
+        tweet_dict = tweet | constant_information
+        try:
+            is_reply = bool(tweet_dict["is_reply"])
+        except KeyError:
+            try:
+                tweet_dict["in_reply_to_user_id"]
+                is_reply = True
+            except KeyError:
+                is_reply = False
+            
+        return Tweet(id=int(tweet_dict["id"]),
+        text=tweet_dict["text"],
+        author_id=int(tweet_dict["author_id"]),
+        conversation_id=int(tweet_dict['conversation_id']),
+        is_reply=is_reply,
+        metrics=TweetMetrics.from_json(tweet_dict["public_metrics"]))
