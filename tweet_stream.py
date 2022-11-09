@@ -11,6 +11,20 @@ class GetAuthorTweet:
     def get_tweets(self, fields:dict):
         return self.api.get_user_tweets(self.author_id, extra_fields=fields)
 
+    def get_stream(author_id:int, api:twitter_api.TwitterAPI) -> None:
+        return TweetStream(GetAuthorTweet(author_id, api))
+
+class GetTweetResponses:
+    def __init__(self, conversation_id:int, api:twitter_api.TwitterAPI) -> None:
+        self.conversation_id = conversation_id
+        self.api = api
+
+    def get_responses(self, fields:dict):
+        return self.api.get_tweet_responses(self.conversation_id, extra_fields=fields)
+    
+    def get_stream(conversation_id:int, api:twitter_api.TwitterAPI) -> None:
+        return TweetStream(GetTweetResponses(conversation_id, api))
+
 class TweetStream:
     def __init__(self, tweet_get:object) -> None:
         self.tweet_get = tweet_get
