@@ -11,7 +11,7 @@ class RateLimit:
         if current_window > self.current_window:
             self.current_window = current_window
             self.current_requests = 0
-        
+        self.current_requests += 1
         if self.current_requests < self.num_requests:
             return
         else:
