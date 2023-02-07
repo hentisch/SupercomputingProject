@@ -46,3 +46,22 @@ class Tweet:
     def get_response_stream(self, api:twitter_api.TwitterAPI):
         response_getter = tweet_stream.GetTweetResponses(self.conversation_id, api)
         return tweet_stream.TweetStream(response_getter)
+
+    def get_dict(self, api, max_replies:int):
+        response_stream = self.get_response_stream(api)
+        replies = []
+        for response in response_stream:
+            if len(replies) >= max_replies:
+                break
+            else:
+                replies.append(response)
+
+        dict_resp = {"id": self.id, "author_id":self.author_id, "content": self.text,
+        "likes": self.metrics.like_count, "retweets": self.metrics.retweet_count, 
+        "quote_count":self.metrics.quote_count, "replies":self.metrics.reply_count}
+
+        if len(replies) <= 0:
+            return dict_resp
+        else:
+            dict_resp["responses"] = [resp.get_json(api, 0) for resp in replies]
+            return dict_resp
