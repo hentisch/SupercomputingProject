@@ -56,7 +56,7 @@ class TweetStream:
             if not self.more_pagination:
                 raise StopIteration
             
-            api_response = self.tweet_get.get_tweets(pagination_token=self.pagination_token, other_fields={"max_results": "5"})
+            api_response = self.tweet_get.get_tweets(pagination_token=self.pagination_token, other_fields={"max_results": "100"})
             
             try:
                 posts = api_response.json()['data']

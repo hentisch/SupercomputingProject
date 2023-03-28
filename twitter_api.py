@@ -1,5 +1,5 @@
 import requests
-from rate_limit import RateLimit
+import time
 
 class TwitterAPI:
 
@@ -47,9 +47,9 @@ class TwitterAPI:
     def __init__(self, bearer_token:str) -> None:
         self.bearer_token = bearer_token
         self.auth_header = {"Authorization": f"Bearer {self.bearer_token}"}
-        self.get_user_tweet_limit = RateLimit(1500)
-        self.get_user_id_limit = RateLimit(300)
-        self.get_responses_limit = RateLimit(300)
+        # self.get_user_tweet_limit = RateLimit(1500-30)
+        # self.get_user_id_limit = RateLimit(300-30)
+        # self.get_responses_limit = RateLimit(300-30)
 
     def get_user_tweets(self, user_id:int, extra_fields = {}) -> requests.Response:
         """ The tweet history of a particular user in the raw form returned by the Twitter API
@@ -66,10 +66,15 @@ class TwitterAPI:
         requests.Response
             The raw response from the Twitter API
         """
+        # print("user tweets")
         fields = {"tweet.fields": self.tweet_fields, "max_results": '100'} | extra_fields
-        self.get_user_tweet_limit.make_request()
-        return requests.get(headers=self.auth_header,
-        url=self.get_url(f"users/{user_id}/tweets", fields))
+        while True:
+            response = requests.get(headers=self.auth_header,
+            url=self.get_url(f"users/{user_id}/tweets", fields))
+            if response.status_code != 429:
+                return response
+            else:
+                time.sleep(60)
     
     def get_user_id(self, username:str, extra_fields = {}) -> requests.Response:
         """ The user id of the Twitter user with the specified username
@@ -86,10 +91,14 @@ class TwitterAPI:
         requests.Response
             The raw response from the Twitter API    
         """
-        self.get_user_id_limit.make_request()
-        response = requests.get(headers=self.auth_header,
-        url=self.get_url(f"users/by/username/{username}", extra_fields))
-        return int(response.json()["data"]["id"])
+        while True:
+            response = requests.get(headers=self.auth_header,
+            url=self.get_url(f"users/by/username/{username}", extra_fields))
+            if response.status_code != 429:
+                return int(response.json()["data"]["id"])
+            else:
+                time.sleep(60)
+
 
     def get_tweet_responses(self, conversation_id:int, extra_fields = {}):
         """ The responses of a particular tweet
@@ -106,7 +115,10 @@ class TwitterAPI:
         requests.Response
             The raw response from the Twitter API """
     
-        self.get_user_tweet_limit.make_request()
         fields = {"query": f"conversation_id:{conversation_id}", "tweet.fields": self.tweet_fields}
-        response = requests.get(headers=self.auth_header, url=self.get_url("tweets/search/recent", fields))
-        return response
+        while True:
+            response = requests.get(headers=self.auth_header, url=self.get_url("tweets/search/recent", fields))
+            if response.status_code != 429:
+                return response
+            else:
+                time.sleep(60)

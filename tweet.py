@@ -63,5 +63,5 @@ class Tweet:
         if len(replies) <= 0:
             return dict_resp
         else:
-            dict_resp["responses"] = [resp.get_json(api, 0) for resp in replies]
+            dict_resp["responses"] = [resp.get_dict(api, 0) for resp in replies]
             return dict_resp
