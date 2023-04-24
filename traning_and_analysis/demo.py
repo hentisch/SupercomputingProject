@@ -7,7 +7,7 @@ import tensorflow_text as text
 import tensorflow_hub as hub
 
 
-model = tf.keras.models.load_model("/home/henry/genes_code/my_model_4")
+model = tf.keras.models.load_model("my_model_4")
 
 def graph_text(text:str):
     val = model(tf.constant([text]))[0]
