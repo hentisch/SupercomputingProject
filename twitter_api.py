@@ -66,7 +66,6 @@ class TwitterAPI:
         requests.Response
             The raw response from the Twitter API
         """
-        # print("user tweets")
         fields = {"tweet.fields": self.tweet_fields, "max_results": '100'} | extra_fields
         while True:
             response = requests.get(headers=self.auth_header,
