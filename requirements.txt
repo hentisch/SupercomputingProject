@@ -1,1 +1,9 @@
 requests
+gradio
+tensorflow
+transformers
+tensorflow_hub
+tensorflow_text
+ssl
+numpy
+scikit-learn
